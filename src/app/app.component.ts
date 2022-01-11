@@ -3,8 +3,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { FormControl } from '@angular/forms';
-import { ICountry } from './models/ICountry';
+import { FormControl } from '@angular/forms'; 
 declare var alasql: any;
 import * as XLSX from 'xlsx';
 import { analyzeAndValidateNgModules } from '@angular/compiler';
@@ -17,7 +16,7 @@ import { analyzeAndValidateNgModules } from '@angular/compiler';
 export class AppComponent {
 
   displayedColumns: string[] = ['name', 'country', 'currency', 'email', 'pin'];
-  dataSource = new MatTableDataSource<ICountry>();
+  dataSource = new MatTableDataSource<any>();
 
   keyupSub: Subscription;
   countriesSub: Subscription;
@@ -41,7 +40,7 @@ export class AppComponent {
     this.dataSource.filter = filterValue;
   }
   getCountries() {
-    this._http.get<ICountry[]>("/assets/country.json").subscribe(res => {
+    this._http.get<any[]>("/assets/country.json").subscribe(res => {
       this.dataSource.data = res;
     })
   }
