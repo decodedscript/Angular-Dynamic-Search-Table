@@ -1,4 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
+import { ICountry } from './models/ICountry';
+declare var alasql: any;
+import * as XLSX from 'xlsx';
+import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +15,39 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'Angular-Dynamic-Search-Table';
+
+  displayedColumns: string[] = ['name', 'country', 'currency', 'email', 'pin'];
+  dataSource = new MatTableDataSource<ICountry>();
+
+  keyupSub: Subscription;
+  countriesSub: Subscription;
+  searchControl = new FormControl();
+  workSheets: any[] = [];
+  constructor(protected _http: HttpClient) {
+
+  }
+  ngOnInit() {
+    this.getCountries();
+    this.subSearchBoxChanges(); 
+  }
+  subSearchBoxChanges() {
+    this.keyupSub = this.searchControl.valueChanges.pipe(
+      debounceTime(500)
+    ).subscribe((val: string) => {
+      this.applyFilter(val);
+    });
+  }
+  applyFilter(filterValue: string): void {
+    this.dataSource.filter = filterValue;
+  }
+  getCountries() {
+    this._http.get<ICountry[]>("/assets/country.json").subscribe(res => {
+      this.dataSource.data = res;
+    })
+  }
+  ngOnDestroy() {
+    this.keyupSub.unsubscribe();
+    this.countriesSub.unsubscribe();
+  }
+ 
 }
